@@ -7,6 +7,7 @@ import github.com.cardosodevfull.authenticationservice.enuns.RoleEnum;
 import github.com.cardosodevfull.authenticationservice.messages.MessageResponse;
 import github.com.cardosodevfull.authenticationservice.repository.UserRepository;
 import github.com.cardosodevfull.authenticationservice.repository.UserRoleRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.beans.Beans;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -40,15 +43,14 @@ public class UserService implements UserDetailsService {
 
         var encriptPassword = passwordEncoder.encode(data.getPassword());
 
-        user.setName(data.getName());
-        user.setLogin(data.getLogin());
+        BeanUtils.copyProperties(data, user);
+
         user.setPassword(encriptPassword);
 
         var newUser = userRepository.save(user);
         userRole.setUser_id(newUser.getId());
         userRole.setDescription(RoleEnum.USER);
         var newUserRole = userRoleRepository.save(userRole);
-
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
